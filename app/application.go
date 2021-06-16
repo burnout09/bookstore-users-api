@@ -8,5 +8,8 @@ var (
 
 func StartApplication() {
 	MapUrls()
-	router.Run(":8080")
+	err := router.Run(":8080")
+	if err != nil {
+		return 
+	}
 }
