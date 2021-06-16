@@ -1,18 +1,15 @@
 package users
 
 import (
-	"fmt"
 	"github.com/burnout09/bookstore-users-api/datasources/mysql/users_db"
 	"github.com/burnout09/bookstore-users-api/utils/date_utils"
 	"github.com/burnout09/bookstore-users-api/utils/errors"
-	"strings"
+	"github.com/burnout09/bookstore-users-api/utils/mysql_utils"
 )
 
 const (
-	indexUniqueEmail = "users_email_uindex"
-	errorNoRows      = "no rows in result set"
-	queryInsertUser  = "INSERT INTO users(first_name,last_name,email,date_created) VALUES(?,?,?,?);"
-	queryGetUser     = "SELECT id,first_name,last_name,email,date_created FROM users WHERE id=?;"
+	queryInsertUser = "INSERT INTO users(first_name,last_name,email,date_created) VALUES(?,?,?,?);"
+	queryGetUser    = "SELECT id,first_name,last_name,email,date_created FROM users WHERE id=?;"
 )
 
 var (
@@ -27,12 +24,8 @@ func (user *User) Get() *errors.RestErr {
 	defer stmt.Close()
 
 	result := stmt.QueryRow(user.Id)
-	if err := result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); err != nil {
-		fmt.Println(err)
-		if strings.Contains(err.Error(), errorNoRows) {
-			return errors.NewNotFoundError(fmt.Sprintf("user %d not found", user.Id))
-		}
-		return errors.NewInternalServerError(fmt.Sprintf("error when trying to get user %d: %s", user.Id, err.Error()))
+	if getErr := result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); getErr != nil {
+		return mysql_utils.ParseError(getErr)
 	}
 
 	return nil
@@ -47,32 +40,17 @@ func (user *User) Save() *errors.RestErr {
 
 	user.DateCreated = date_utils.GetNowString()
 
-	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
-	if err != nil {
-		if strings.Contains(err.Error(), indexUniqueEmail) {
-			return errors.NewBadRequestError(fmt.Sprintf("email %s already exists", user.Email))
-		}
-		return errors.NewInternalServerError(fmt.Sprintf("error when trying to save user :%s", err.Error()))
+	insertResult, saveErr := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
+	if saveErr != nil {
+		return mysql_utils.ParseError(saveErr)
 	}
 
 	userId, err := insertResult.LastInsertId()
 	if err != nil {
-		return errors.NewInternalServerError(fmt.Sprintf("error when trying to save user :%s", err.Error()))
+		return mysql_utils.ParseError(saveErr)
 	}
 
 	user.Id = userId
-
-	//current := usersBD[user.Id]
-	//if current != nil {
-	//	if current.Email == user.Email {
-	//		return errors.NewBadRequestError(fmt.Sprintf("email %s already registered", user.Email))
-	//	}
-	//	return errors.NewBadRequestError(fmt.Sprintf("user %d already exists", user.Id))
-	//}
-	//
-
-	//
-	//usersBD[user.Id] = user
 
 	return nil
 }
