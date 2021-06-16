@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"github.com/burnout09/bookstore-users-api/utils/date_utils"
 	"github.com/burnout09/bookstore-users-api/utils/errors"
 )
 
@@ -31,6 +32,8 @@ func (user *User) Save() *errors.RestErr {
 		}
 		return errors.NewBadRequestError(fmt.Sprintf("user %d already exists", user.Id))
 	}
+
+	user.DateCreated = date_utils.GetNowString()
 
 	usersBD[user.Id] = user
 
