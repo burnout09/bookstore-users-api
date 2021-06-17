@@ -39,3 +39,6 @@ alter table users
 alter table users
 	add password varchar(32) not null;
 ````
+
+## Run App
+-  mysql_users_username=root mysql_users_password=burnout mysql_users_host=127.0.0.1:3306 mysql_users_schema=users_db go run main.go
