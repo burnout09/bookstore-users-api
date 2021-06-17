@@ -18,8 +18,6 @@ func getUserId(userIdParam string) (int64, *errors.RestErr) {
 }
 
 func Create(c *gin.Context) {
-	var user users.User
-
 	//bytes, err := ioutil.ReadAll(c.Request.Body)
 	//if err != nil {
 	//	//TODO: Handle errors
@@ -33,6 +31,7 @@ func Create(c *gin.Context) {
 	//	return
 	//}
 
+	var user users.User
 	//ShouldBindJSON equivalente de usar ioutil.ReadAll y json.Unmarshal
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := errors.NewBadRequestError("Invalid json body")
@@ -104,4 +103,14 @@ func Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
+}
+
+func Search(c *gin.Context) {
+	status := c.Query("status")
+	users, err := services.Search(status)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+	c.JSON(http.StatusOK, users)
 }

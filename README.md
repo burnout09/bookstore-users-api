@@ -21,3 +21,13 @@ constraint users_email_uindex
 unique (email)
 );
 ````
+
+## Alter Table
+
+````
+alter table users
+	add status varchar(45) not null;
+
+alter table users
+	add password varchar(32) not null;
+````
