@@ -1,5 +1,13 @@
 # bookstore-users-api
 
+## Crear Go Mod
+- go mod init github.com/burnout09/bookstore-users-api
+
+## Add Dependencies
+- go get github.com/VividCortex/mysqlerr
+- go get github.com/gin-gonic/gin
+- go get github.com/go-sql-driver/mysql
+
 ## Creacion de MySQL Schema
 - CREATE SCHEMA `users_db` DEFAULT CHAR SET utf8 COLLATE utf8_spanish2_ci;
 
