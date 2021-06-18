@@ -7,6 +7,7 @@
 - go get github.com/VividCortex/mysqlerr
 - go get github.com/gin-gonic/gin
 - go get github.com/go-sql-driver/mysql
+- go get -u go.uber.org/zap
 
 ## Creacion de MySQL Schema
 - CREATE SCHEMA `users_db` DEFAULT CHAR SET utf8 COLLATE utf8_spanish2_ci;
