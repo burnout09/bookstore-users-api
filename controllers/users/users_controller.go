@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"github.com/burnout09/bookstore-users-api/domain/users"
 	"github.com/burnout09/bookstore-users-api/services"
 	"github.com/burnout09/bookstore-users-api/utils/errors"
@@ -113,4 +114,22 @@ func Search(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, users.Marshall(c.GetHeader("X-Public") == "true"))
+}
+
+func Login(c *gin.Context) {
+	var request users.LoginRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		restError := errors.NewBadRequestError("invalid json body")
+		c.JSON(restError.Status, restError)
+		return
+	}
+	user, err := services.UsersService.LoginUser(request)
+	fmt.Println("LOGIN")
+	fmt.Println(err)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+	//c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
 }
